@@ -8,21 +8,21 @@ from multipledispatch import dispatch
 def GenerateHandshakeRequest():
     startingByte = 0xAA # Starting byte
     byteLength = 5 # byte length
-    command = 0x01
-    status = 1 # 1 - Request, 2 - Received
+    command = 0xFF
+    status = 0x00 # 0 - Request, 2 - Received
     checksum = startingByte ^ byteLength ^ command ^ status
     output = bytearray([startingByte, byteLength, command, status, checksum])
+    print(f"{output}")
     return output
 
 @dispatch(int)
 def GenerateHandshakeRequest(id):
     startingByte = 0xAA # Starting byte
-    byteLength = 6 # byte length
-    command = 0x01
-    status = 2
-    idNum = id
-    checksum = startingByte ^  byteLength ^ command ^ status ^ idNum
-    output = bytearray([startingByte, byteLength, command, status, idNum, checksum])
+    byteLength = 5 # byte length
+    command = 0xFF
+    status = id
+    checksum = startingByte ^  byteLength ^ command ^ status
+    output = bytearray([startingByte, byteLength, command, status, checksum])
     return output
 
 def Handshake(ser, id):
@@ -30,7 +30,7 @@ def Handshake(ser, id):
     request = GenerateHandshakeRequest()
     # ser.write(b'H')  # Send handshake request
     ser.write(request)  # Send handshake request
-    response = ser.read(2)
+    response = ser.read(5)
     print(f"Received response: {response}")
     if response:
         if response[0] == 0xAA:
@@ -62,7 +62,7 @@ def FindArduino(id):
     for port in ports:
         try:
             print(f"Attempting port: {port.device}")
-            ser = serial.Serial(port.device, 9600, timeout=5)
+            ser = serial.Serial(port=port.device, baudrate=9600, timeout=5)
             time.sleep(2)  # Wait for Arduino to initialize
             if Handshake(ser, id):
                 return ser

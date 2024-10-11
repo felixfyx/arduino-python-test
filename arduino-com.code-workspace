@@ -4,9 +4,6 @@
 			"path": "arduino-com"
 		},
 		{
-			"path": "mock-server"
-		},
-		{
 			"path": "."
 		}
 	]

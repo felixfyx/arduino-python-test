@@ -1,14 +1,21 @@
-#include <Arduino.h>
+#include "globals.h"
+#include "SerialMessageHandler.h"
 
 const int id = 1; // Unique ID for each Arduino board
-uint8_t _inputBuffer[64]; 
-uint8_t _bufferIndex = 0;
-bool _startByteReceived = false;
+SerialMessageHandler *serialMessageHandler = nullptr;
 
-void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(9600);
-  digitalWrite(LED_BUILTIN, LOW);
+void setup()
+{
+    pinMode(LED_BUILTIN, OUTPUT);
+
+    serialMessageHandler = SerialMessageHandler::GetInstance();
+
+    digitalWrite(LED_BUILTIN, LOW);
+}
+
+void loop()
+{
+    serialMessageHandler->Update();
 }
 
 /*
@@ -33,6 +40,7 @@ void loop() {
 }
 */
 
+/*
 void WriteBackHandshake()
 {
   uint8_t buffer[2] = {0, 0};
@@ -69,7 +77,7 @@ void loop()
         uint8_t length = _inputBuffer[1];
         uint8_t identifier = _inputBuffer[2];
         uint8_t checksum = _inputBuffer[length - 1];
-        
+
         // Verify checksum
         uint8_t calculatedChecksum = 0;
         for (int i = 0; i < length - 1; i++) {
@@ -99,3 +107,4 @@ void loop()
     }
   }
 }
+*/
